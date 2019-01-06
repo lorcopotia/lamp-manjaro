@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Script writen by Duanel Garrido Milan
+# License GPLv3
+
+echo
+echo ">> LAMP server for Manjaro/Arch-based distros"
+
+if (( $EUID != 0 )); then
+    echo "Please run as root"
+    exit 1
+fi
+
+echo ">> Installation of nessesary packages"
+
+pacman -S apache mariadb php php-apache --noconfirm 
+
+if [ "$?" -ne "0" ]; then
+  echo "Sorry, cannot install any packages. Check you internet connection"
+  exit 1
+fi
+
+echo ">> Done!"
+echo ">> Enabling PHP for Apache"
+
+sed -i.bak '/LoadModule mpm_event_module/s/^/#/g' httpd.conf ## Comment out
+sed -i.bak '/LoadModule mpm_prefork_module/s/^#//g' httpd.conf ## Uncomment
+
+echo "LoadModule php7_module modules/libphp7.so" >> httpd.conf
+echo "AddHandler php7-script php" >> httpd.conf
+echo "Include conf/extra/php7_module.conf" >> httpd.conf
+
+sed -i.bak '/extension=mysql.so/s/^/;/g' /etc/php/php.ini ## Comment out
+sed -i.bak '/extension=mysql.so/s/^;//g' /etc/php/php.ini ## Uncomment
+
+echo "Enabling and starting Apache"
+systemctl enable httpd
+systemctl restart httpd
+
+if [ "$?" -ne "0" ]; then
+  systemctl status httpd
+  exit 1
+fi
+
+echo ">> Setting up MariaDB" 
+mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+
+echo "Enabling and starting MariaDB"
+systemctl enable mysqld
+systemctl start mysqld
+
+if [ "$?" -ne "0" ]; then
+  systemctl status mysqld
+  exit 1
+fi
+
+mysql_secure_installation
+
+
+
+
