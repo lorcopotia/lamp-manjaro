@@ -45,7 +45,7 @@ echo "Include conf/extra/php7_module.conf" >> $APACHE_CONF_FILE
 sed -i.bak '/extension=mysql.so/s/^/;/g' $PHP_INI ## Comment out
 sed -i.bak '/extension=mysql.so/s/^;//g' $PHP_INI ## Uncomment
 
-echo "Enabling and starting Apache"
+echo ">> Enabling and starting Apache"
 systemctl enable httpd
 systemctl restart httpd
 
@@ -54,10 +54,14 @@ if [ "$?" -ne "0" ]; then
   exit 1
 fi
 
-echo ">> Setting up MariaDB" 
+echo "<?php phpinfo(); ?>" > /srv/http/index.php
+echo ">> Apache/PHP installation completed!"
+echo ">> You may test Apache/PHP on http://localhost"
+echo ">> Setting up MariaDB"
+
 mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
 
-echo "Enabling and starting MariaDB"
+echo ">> Enabling and starting MariaDB"
 systemctl enable mysqld
 systemctl start mysqld
 
@@ -73,4 +77,5 @@ if [ "$?" -ne "0" ]; then
   exit 1
 fi
 
-echo ">> Done! Installation completed!"
+echo ">> MariaDB server installation completed!"
+echo ">> Enjoy!"
