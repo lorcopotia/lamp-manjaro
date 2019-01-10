@@ -1,16 +1,22 @@
 #!/bin/bash
 
-# Script writen by Duanel Garrido Milan
+# Script written by Duanel Garrido Milan
 # License GPLv3
 
 APACHE_CONF_FILE="/etc/httpd/conf/httpd.conf"
 PHP_INI="/etc/php/php.ini"
 
-echo "#############################################"
-echo ">> LAMP server for Manjaro/Arch-based distros"
+RED='\033[0;31m'
+GREEN='\033[0;31m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+echo "##################################################################"
+echo ">> ${BLUE}LAMP server installation script for Manjaro/Arch-based distros"
+echo "##################################################################"
 
 if (( $EUID != 0 )); then
-    echo "Please run as root"
+    echo -e "${RED}Please run as root"
     exit 1
 fi
 
@@ -18,22 +24,22 @@ echo ">> Ensuring that the system is up-to-date"
 pacman -Syyu --noconfirm
 
 if [ "$?" -ne "0" ]; then
-  echo "Sorry, something went wrong. Check you internet connection"
+  echo -e "${RED}Sorry, something went wrong. Check you internet connection"
   exit 1
 fi
 
-echo ">> Done!"
-echo ">> Installation of nessesary packages"
+echo -e ">> ${GREEN}Done!"
+echo -e ">> ${BLUE}Installation of nessesary packages"
 
 pacman -S apache mariadb php php-apache --noconfirm 
 
 if [ "$?" -ne "0" ]; then
-  echo "Sorry, cannot install any packages. Check you internet connection"
+  echo -e "${RED}Sorry, cannot install any packages. Check you internet connection"
   exit 1
 fi
 
-echo ">> Done!"
-echo ">> Enabling PHP for Apache"
+echo -e ">> ${GREEN}Done!"
+echo -e ">> ${BLUE}Enabling PHP for Apache"
 
 sed -i.bak '/LoadModule mpm_event_module/s/^/#/g' $APACHE_CONF_FILE ## Comment out
 sed -i.bak '/LoadModule mpm_prefork_module/s/^#//g' $APACHE_CONF_FILE ## Uncomment
@@ -45,7 +51,7 @@ echo "Include conf/extra/php7_module.conf" >> $APACHE_CONF_FILE
 sed -i.bak '/extension=mysql.so/s/^/;/g' $PHP_INI ## Comment out
 sed -i.bak '/extension=mysql.so/s/^;//g' $PHP_INI ## Uncomment
 
-echo ">> Enabling and starting Apache"
+echo -e ">> ${BLUE}Enabling and starting Apache"
 systemctl enable httpd
 systemctl restart httpd
 
@@ -55,13 +61,13 @@ if [ "$?" -ne "0" ]; then
 fi
 
 echo "<?php phpinfo(); ?>" > /srv/http/index.php
-echo ">> Apache/PHP installation completed!"
-echo ">> You may test Apache/PHP on http://localhost"
-echo ">> Setting up MariaDB"
+echo -e ">> ${GREEN}Apache/PHP installation completed!"
+echo -e ">> ${BLUE}You may test Apache/PHP on http://localhost"
+echo -e ">> ${BLUE}Setting up MariaDB"
 
 mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
 
-echo ">> Enabling and starting MariaDB"
+echo -e ">> ${BLUE}Enabling and starting MariaDB"
 systemctl enable mysqld
 systemctl start mysqld
 
@@ -73,9 +79,10 @@ fi
 mysql_secure_installation
 
 if [ "$?" -ne "0" ]; then
-  echo "Something went wrong. Please check the logs for more information."
+  echo -e "${RED}Something went wrong. Please check the logs for more information."
   exit 1
 fi
-
-echo ">> MariaDB server installation completed!"
-echo ">> Enjoy!"
+echo "#############################################"
+echo -e ">> ${GREEN}MariaDB server installation completed!"
+echo -e ">> ${GREEN}Enjoy!"
+echo "#############################################"
