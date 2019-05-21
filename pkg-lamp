@@ -66,7 +66,7 @@ echo -e ">> ${BLUE}You may test Apache/PHP on http://localhost${NC}"
 
 if [ mysqladmin ping > /dev/null 2>&1 ]
 then 
-    echo -e ">> ${BLUE}"Mysql Server is already up and RUNNING${NC}" 
+    echo -e ">> ${BLUE}Mysql Server is already up and RUNNING${NC}"
 else
     echo -e ">> ${BLUE}Setting up MariaDB${NC}"
     mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
@@ -87,9 +87,8 @@ else
         exit 1
     fi
 fi
-    echo "#############################################"
-    echo -e ">> ${GREEN}MariaDB server installation completed!${NC}"
-    echo -e ">> ${GREEN}Enjoy!${NC}"
-    echo "#############################################"
+echo "#############################################"
+echo -e ">> ${GREEN}MariaDB server installation completed!${NC}"
+echo -e ">> ${GREEN}Enjoy!${NC}"
+echo "#############################################"
     
-echo -e ">> ${GREEN}Script terminated successfully. Enjoy!${NC}"
