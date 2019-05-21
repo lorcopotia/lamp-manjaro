@@ -63,26 +63,32 @@ fi
 echo "<?php phpinfo(); ?>" > /srv/http/index.php
 echo -e ">> ${GREEN}Apache/PHP installation completed!${NC}"
 echo -e ">> ${BLUE}You may test Apache/PHP on http://localhost${NC}"
-echo -e ">> ${BLUE}Setting up MariaDB${NC}"
 
-mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+if [ mysqladmin ping > /dev/null 2>&1 ]
+then 
+    echo -e ">> ${BLUE}"Mysql Server is already up and RUNNING${NC}" 
+else
+    echo -e ">> ${BLUE}Setting up MariaDB${NC}"
+    mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+    
+    echo -e ">> ${BLUE}Enabling and starting MariaDB${NC}"
+    systemctl enable mysqld
+    systemctl start mysqld
 
-echo -e ">> ${BLUE}Enabling and starting MariaDB${NC}"
-systemctl enable mysqld
-systemctl start mysqld
+    if [ "$?" -ne "0" ]; then
+        systemctl status mysqld
+        exit 1
+    fi
 
-if [ "$?" -ne "0" ]; then
-  systemctl status mysqld
-  exit 1
+    mysql_secure_installation
+
+    if [ "$?" -ne "0" ]; then
+        echo -e "${RED}Something went wrong. Please check the logs for more information.${NC}"
+        exit 1
+    fi
+    echo "#############################################"
+    echo -e ">> ${GREEN}MariaDB server installation completed!${NC}"
+    echo -e ">> ${GREEN}Enjoy!${NC}"
+    echo "#############################################"
 fi
-
-mysql_secure_installation
-
-if [ "$?" -ne "0" ]; then
-  echo -e "${RED}Something went wrong. Please check the logs for more information.${NC}"
-  exit 1
-fi
-echo "#############################################"
-echo -e ">> ${GREEN}MariaDB server installation completed!${NC}"
-echo -e ">> ${GREEN}Enjoy!${NC}"
-echo "#############################################"
+echo -e ">> ${GREEN}Script terminated successfully. Enjoy!${NC}"
