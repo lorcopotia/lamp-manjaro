@@ -86,9 +86,10 @@ else
         echo -e "${RED}Something went wrong. Please check the logs for more information.${NC}"
         exit 1
     fi
+fi
     echo "#############################################"
     echo -e ">> ${GREEN}MariaDB server installation completed!${NC}"
     echo -e ">> ${GREEN}Enjoy!${NC}"
     echo "#############################################"
-fi
+    
 echo -e ">> ${GREEN}Script terminated successfully. Enjoy!${NC}"
