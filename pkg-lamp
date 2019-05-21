@@ -31,7 +31,7 @@ fi
 echo -e ">> ${GREEN}Done!${NC}"
 echo -e ">> ${BLUE}Installation of nessesary packages${NC}"
 
-pacman -S apache mariadb php php-apache --noconfirm 
+pacman -S apache mariadb php php-apache --noconfirm --needed
 
 if [ "$?" -ne "0" ]; then
   echo -e "${RED}Sorry, cannot install any packages. Check you internet connection${NC}"
